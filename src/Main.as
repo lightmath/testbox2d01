@@ -25,26 +25,42 @@ package
 	{
 		
 		private var world:b2World;
+		private var sphereVector:Vector.<b2Body>;
 		public function Main()
 		{
 			world=new b2World(new b2Vec2(0,5),true);
 			debugDraw();
-			addChild(textMon);
-			textMon.textColor=0xffffff;
-			textMon.width=300;
-			textMon.height=300;
-			textFormat.size=25;
-			textMon.defaultTextFormat=textFormat;
-			brick(275,435,30,30, "breakable");
-			brick(365,435,30,30, "breakable");
-			brick(320,405,120,30, "breakable");
-			brick(320,375,60,30, "unbreakable");
-			brick(305,345,90,30, "breakable");
-			brick(320,300,120,60, "unbreakable");
-			idol(320,242);
+//			addChild(textMon);
+//			textMon.textColor=0xffffff;
+//			textMon.width=300;
+//			textMon.height=300;
+//			textFormat.size=25;
+//			textMon.defaultTextFormat=textFormat;
+//			brick(275,435,30,30, "breakable");
+//			brick(365,435,30,30, "breakable");
+//			brick(320,405,120,30, "breakable");
+//			brick(320,375,60,30, "unbreakable");
+//			brick(305,345,90,30, "breakable");
+//			brick(320,300,120,60, "unbreakable");
+//			idol(320,242);
 			floor();
+			sphereVector=new Vector.<b2Body>();
+			for (var i:int=0; i<3; i++) {
+				sphereVector.push(sphere(170+i*150,410,40));
+			}
 			addEventListener(Event.ENTER_FRAME,updateWorld);
 			stage.addEventListener(MouseEvent.CLICK, destroyBrick);
+		}
+		
+		
+		private function sphere(pX:int, pY:int, r:Number):b2Body
+		{
+			var bodyDef:b2BodyDef = new b2BodyDef();
+			bodyDef.position.Set(pX/worldScale, pY/worldScale);
+			bodyDef.type = b2Body.b2_dynamicBody;
+			
+			
+			
 		}
 		
 		private var worldScale:Number = 30;
