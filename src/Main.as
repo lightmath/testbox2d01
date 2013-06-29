@@ -1,5 +1,6 @@
 package
 {
+	import Box2D.Collision.Shapes.b2CircleShape;
 	import Box2D.Collision.Shapes.b2PolygonShape;
 	import Box2D.Common.Math.b2Vec2;
 	import Box2D.Dynamics.b2Body;
@@ -48,8 +49,18 @@ package
 			for (var i:int=0; i<3; i++) {
 				sphereVector.push(sphere(170+i*150,410,40));
 			}
+			var force:b2Vec2=new b2Vec2(0,-15);
+			var forceByMass:b2Vec2=force.Copy();
+			forceByMass.Multiply(sphereVector[1].GetMass());
+			var forceByMassByTime:b2Vec2=forceByMass.Copy();
+			forceByMassByTime.Multiply(30);
+			var sphereCenter:b2Vec2=sphereVector[0].GetWorldCenter();
+			sphereVector[0].ApplyForce(forceByMassByTime,sphereCenter);
+			sphereCenter=sphereVector[1].GetWorldCenter();
+			sphereVector[1].ApplyImpulse(forceByMass,sphereCenter);
+			sphereVector[2].SetLinearVelocity(force);
 			addEventListener(Event.ENTER_FRAME,updateWorld);
-			stage.addEventListener(MouseEvent.CLICK, destroyBrick);
+//			stage.addEventListener(MouseEvent.CLICK, destroyBrick);
 		}
 		
 		
@@ -58,9 +69,19 @@ package
 			var bodyDef:b2BodyDef = new b2BodyDef();
 			bodyDef.position.Set(pX/worldScale, pY/worldScale);
 			bodyDef.type = b2Body.b2_dynamicBody;
-			
-			
-			
+			var obj:Object = {};
+			obj.visible = true;
+			obj.pY = pY;
+			bodyDef.userData = obj;
+			var circleShape:b2CircleShape = new b2CircleShape(r/worldScale);
+			var fixtureDef:b2FixtureDef = new b2FixtureDef();
+			fixtureDef.shape = circleShape;
+			fixtureDef.density = 1;
+			fixtureDef.restitution = 0.4;
+			fixtureDef.friction=0.5;
+			var theSphere:b2Body=world.CreateBody(bodyDef);
+			theSphere.CreateFixture(fixtureDef);
+			return theSphere;
 		}
 		
 		private var worldScale:Number = 30;
@@ -139,30 +160,50 @@ package
 		private var textFormat:TextFormat = new TextFormat();
 		private function updateWorld(e:Event):void
 		{
-			var radToDeg:Number = 180/Math.PI;
+			var maxHeight:Number;
+			var currHeight:Number;
+			var outHeight:Number;
 			world.Step(1/30,10,10);
-			world.ClearForces();
-			for (var b:b2Body=world.GetBodyList(); b; b=b.GetNext()) {
-				if (b.GetUserData() && b.GetUserData()["s"]=="idol") {
-					var position:b2Vec2=b.GetPosition();
-					var xPos:Number=Math.round(position.x*worldScale);
-					textMon.text=xPos.toString();
-					textMon.appendText(",");
-					var yPos:Number=Math.round(position.y*worldScale);
-					textMon.appendText(yPos.toString());
-					textMon.appendText("\nangle: ");
-					var angle:Number=Math.round(b.GetAngle()*radToDeg);
-					textMon.appendText(angle.toString());
-					textMon.appendText("\nVelocity: ");
-					var velocity:b2Vec2=b.GetLinearVelocity();
-					var xVel:Number=Math.round(velocity.x*worldScale);
-					textMon.appendText(xVel.toString());
-					textMon.appendText(",");
-					var yVel:Number=Math.round(velocity.y*worldScale);
-					textMon.appendText(yVel.toString());
-				}
+			for (var i:int=0; i<3; i++) 
+			{
+				var obj:Object = sphereVector[i].GetUserData();
+				maxHeight=obj.pY;
+				currHeight=sphereVector[i].GetPosition().y*worldScale;
+				maxHeight=Math.min(maxHeight,currHeight);
+				obj.pY = maxHeight;
+				sphereVector[i].SetUserData(obj);
+				outHeight=obj.pY;
+				trace("Sphere "+i+":"+Math.round(outHeight));
 			}
+			trace("---------------");
+			world.ClearForces();
 			world.DrawDebugData();
+			
+			
+//			var radToDeg:Number = 180/Math.PI;
+//			world.Step(1/30,10,10);
+//			world.ClearForces();
+//			for (var b:b2Body=world.GetBodyList(); b; b=b.GetNext()) {
+//				if (b.GetUserData() && b.GetUserData()["s"]=="idol") {
+//					var position:b2Vec2=b.GetPosition();
+//					var xPos:Number=Math.round(position.x*worldScale);
+//					textMon.text=xPos.toString();
+//					textMon.appendText(",");
+//					var yPos:Number=Math.round(position.y*worldScale);
+//					textMon.appendText(yPos.toString());
+//					textMon.appendText("\nangle: ");
+//					var angle:Number=Math.round(b.GetAngle()*radToDeg);
+//					textMon.appendText(angle.toString());
+//					textMon.appendText("\nVelocity: ");
+//					var velocity:b2Vec2=b.GetLinearVelocity();
+//					var xVel:Number=Math.round(velocity.x*worldScale);
+//					textMon.appendText(xVel.toString());
+//					textMon.appendText(",");
+//					var yVel:Number=Math.round(velocity.y*worldScale);
+//					textMon.appendText(yVel.toString());
+//				}
+//			}
+//			world.DrawDebugData();
 		}
 		
 		private function destroyBrick(e:MouseEvent):void
