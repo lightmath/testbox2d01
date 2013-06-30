@@ -3,19 +3,24 @@ package
 	import Box2D.Collision.Shapes.b2CircleShape;
 	import Box2D.Collision.Shapes.b2PolygonShape;
 	import Box2D.Common.Math.b2Vec2;
+	import Box2D.Dynamics.Contacts.b2Contact;
+	import Box2D.Dynamics.Contacts.b2ContactEdge;
 	import Box2D.Dynamics.b2Body;
 	import Box2D.Dynamics.b2BodyDef;
 	import Box2D.Dynamics.b2DebugDraw;
+	import Box2D.Dynamics.b2Fixture;
 	import Box2D.Dynamics.b2FixtureDef;
 	import Box2D.Dynamics.b2World;
 	
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
+	import flash.text.TextField;
+	import flash.text.TextFormat;
 	
 	
 	/**
-	 * 
+	 * 愤怒的小猪+碰撞检测
 	 * @author LC
 	 */
 	[SWF(width="640", height="480", backgroundColor="0x333333", frameRate="30")]
@@ -27,11 +32,15 @@ package
 		private var slingX:int=100;
 		private var slingY:int=250;
 		private var slingR:int = 75;
+		private var gameOver:Boolean=false;
+		private var textMon:TextField = new TextField();
+		private var textFormat:TextFormat = new TextFormat();
 		
 		public function Main01()
 		{
 			super();
 			world=new b2World(new b2Vec2(0,5),true);
+			world.SetContactListener(new customContact());
 			debugDraw();
 			floor();
 			brick(402,431,140,36);
@@ -51,6 +60,7 @@ package
 			brick(450,363,16,64);
 			brick(498,363,16,64);
 			brick(474,322,64,16);
+			pig(474,232,16);
 			var slingCanvas:Sprite=new Sprite();
 			slingCanvas.graphics.lineStyle(1,0xffffff);
 			slingCanvas.graphics.drawCircle(0,0,slingR);
@@ -117,6 +127,7 @@ package
 			var bodyDef:b2BodyDef=new b2BodyDef();
 			bodyDef.position.Set(pX/worldScale,pY/worldScale);
 			bodyDef.type=b2Body.b2_dynamicBody;
+			bodyDef.userData = "brick";
 			var polygonShape:b2PolygonShape=new b2PolygonShape();
 			polygonShape.SetAsBox(w/2/worldScale,h/2/worldScale);
 			var fixtureDef:b2FixtureDef=new b2FixtureDef();
@@ -128,10 +139,27 @@ package
 			theBrick.CreateFixture(fixtureDef);
 		}
 		
+		private function pig(pX:Number, pY:Number, r:Number):void
+		{
+			var bodyDef:b2BodyDef=new b2BodyDef();
+			bodyDef.position.Set(pX/worldScale,pY/worldScale);
+			bodyDef.type=b2Body.b2_dynamicBody;
+			bodyDef.userData = "pig";
+			var pigShape:b2CircleShape = new b2CircleShape(r/worldScale);
+			var fixtureDef:b2FixtureDef = new b2FixtureDef();
+			fixtureDef.shape = pigShape;
+			fixtureDef.density = 1;
+			fixtureDef.restitution = 0.4;
+			fixtureDef.friction = 0.5;
+			var thePig:b2Body = world.CreateBody(bodyDef);
+			thePig.CreateFixture(fixtureDef);
+		}
+		
 		private function floor():void
 		{
 			var bodyDef:b2BodyDef = new b2BodyDef();
 			bodyDef.position.Set(320/worldScale,465/worldScale);
+			bodyDef.userData = "floor";
 			var polygonShape:b2PolygonShape=new b2PolygonShape();
 			polygonShape.SetAsBox(320/worldScale,15/worldScale);
 			var fixtureDef:b2FixtureDef=new b2FixtureDef();
@@ -154,9 +182,80 @@ package
 		}
 		
 		private function updateWorld(e:Event):void {
+//			var radToDeg:Number=180/Math.PI;
+//			world.Step(1/30,10,10);
+//			world.ClearForces();
+//			if (! gameOver) {
+//				for (var b:b2Body=world.GetBodyList();b; b=b.GetNext()) {
+//					if (b.GetUserData()=="idol") {
+//						var position:b2Vec2=b.GetPosition();
+//						var xPos:Number=Math.round(position.x*worldScale);
+//						textMon.text=xPos.toString();
+//						textMon.appendText(",");
+//						var yPos:Number=Math.round(position.y*worldScale);
+//						textMon.appendText(yPos.toString());
+//						textMon.appendText("\nangle: ");
+//						var angle:Number = Math.round(b.GetAngle()*radToDeg);
+//						textMon.appendText(angle.toString());
+//						textMon.appendText("\nVelocity");
+//						var velocity:b2Vec2 = b.GetLinearVelocity();
+//						var xVel:Number = Math.round(velocity.x*worldScale);
+//						textMon.appendText(xVel.toString());
+//						textMon.appendText(",");
+//						var yVel:Number=Math.round(velocity.y*worldScale);
+//						textMon.appendText(yVel.toString());
+//						for (var c:b2ContactEdge=b.GetContactList(); c; c=c.next) {
+//							var contact:b2Contact=c.contact;
+//							var fixtureA:b2Fixture=contact.GetFixtureA();
+//							var fixtureB:b2Fixture=contact.GetFixtureB();
+//							var bodyA:b2Body=fixtureA.GetBody();
+//							var bodyB:b2Body=fixtureB.GetBody();
+//							var userDataA:String=bodyA.GetUserData();
+//							var userDataB:String=bodyB.GetUserData();
+//							if (userDataA=="floor" && userDataB=="idol") {
+//								levelFailed();
+//							}
+//							if (userDataA=="idol" && userDataB=="floor") {
+//								levelFailed();
+//							}
+//						}
+//					}
+//				}
+//			}
 			world.Step(1/30,10,10);
 			world.ClearForces();
+			for (var b:b2Body=world.GetBodyList(); b; b=b.GetNext()) {
+				if (b.GetUserData()=="remove") {
+					world.DestroyBody(b);
+				}
+			}
 			world.DrawDebugData();
+		}	
+							
+		private function levelFailed():void {
+			textMon.text="Oh no, poor idol!!!";
+			stage.removeEventListener
+				(MouseEvent.CLICK,destroyBrick);
+			gameOver=true;
+		}			
+		
+		private function destroyBrick(e:MouseEvent):void
+		{
+			var px:Number = mouseX/worldScale;
+			var py:Number = mouseY/worldScale;
+			world.QueryPoint(queryCallback,new b2Vec2(px,py));
+			
+		}
+		
+		private function queryCallback(fixture:b2Fixture):Boolean
+		{
+			var touchedBody:b2Body = fixture.GetBody();
+			trace(touchedBody);
+			if(touchedBody.GetUserData() == "breakable")
+			{
+				world.DestroyBody(touchedBody);
+			}
+			return false;
 		}
 	}
 }

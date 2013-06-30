@@ -63,7 +63,6 @@ package
 //			stage.addEventListener(MouseEvent.CLICK, destroyBrick);
 		}
 		
-		
 		private function sphere(pX:int, pY:int, r:Number):b2Body
 		{
 			var bodyDef:b2BodyDef = new b2BodyDef();
