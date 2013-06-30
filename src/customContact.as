@@ -9,45 +9,56 @@ package
 	
 	public class customContact extends b2ContactListener
 	{
-		private const KILLBRICK:Number=25;
-		private const KILLPIG:Number=5;
+		private const KILLBRICK:Number=5;
+		private const KILLPIG:Number=1;
 		
 		override public function BeginContact(contact:b2Contact):void
 		{
-			trace("a collision started");
+//			trace("a collision started");
 			var fixtureA:b2Fixture=contact.GetFixtureA();
 			var fixtureB:b2Fixture=contact.GetFixtureB();
 			var bodyA:b2Body=fixtureA.GetBody();
 			var bodyB:b2Body=fixtureB.GetBody();
-			trace("first body: "+bodyA.GetUserData());
-			trace("second body: "+bodyB.GetUserData());
-			trace("---------------------------");
+//			trace("first body: "+bodyA.GetUserData());
+//			trace("second body: "+bodyB.GetUserData());
+//			trace("---------------------------");
 		}
 		
 		override public function EndContact(contact:b2Contact):void
 		{
-			trace("a collision ended");
+//			trace("a collision ended");
 			var fixtureA:b2Fixture=contact.GetFixtureA();
 			var fixtureB:b2Fixture=contact.GetFixtureB();
 			var bodyA:b2Body=fixtureA.GetBody();
 			var bodyB:b2Body=fixtureB.GetBody();
-			trace("first body: "+bodyA.GetUserData());
-			trace("second body: "+bodyB.GetUserData());
-			trace("---------------------------");
+//			trace("first body: "+bodyA.GetUserData());
+//			trace("second body: "+bodyB.GetUserData());
+//			trace("---------------------------");
 		}
 		
 		override public function PreSolve(contact:b2Contact,
 										  oldManifold:b2Manifold):void {
-			var fixtureA:b2Fixture=contact.GetFixtureA();
-			var fixtureB:b2Fixture=contact.GetFixtureB();
-			var dataA:String=fixtureA.GetBody().GetUserData();
-			var dataB:String=fixtureB.GetBody().GetUserData();
-			if (dataA=="cart" && dataB=="projectile") {
-				contact.SetEnabled(false);
+			if (contact.GetManifold().m_pointCount>0) {
+				trace("a collision has been pre solved");
+				var fixtureA:b2Fixture=contact.GetFixtureA();
+				var fixtureB:b2Fixture=contact.GetFixtureB();
+				var bodyA:b2Body=fixtureA.GetBody();
+				var bodyB:b2Body=fixtureB.GetBody();
+				trace("first body: "+bodyA.GetUserData());
+				trace("second body: "+bodyB.GetUserData());
+				trace("---------------------------");
 			}
-			if (dataB=="cart" && dataA=="projectile") {
-				contact.SetEnabled(false);
-			}
+			
+//			var fixtureA:b2Fixture=contact.GetFixtureA();
+//			var fixtureB:b2Fixture=contact.GetFixtureB();
+//			var dataA:String=fixtureA.GetBody().GetUserData();
+//			var dataB:String=fixtureB.GetBody().GetUserData();
+//			if (dataA=="cart" && dataB=="projectile") {
+//				contact.SetEnabled(false);
+//			}
+//			if (dataB=="cart" && dataA=="projectile") {
+//				contact.SetEnabled(false);
+//			}
 		}
 		
 		override public function PostSolve(contact:b2Contact,impulse:b2ContactImpulse):void 

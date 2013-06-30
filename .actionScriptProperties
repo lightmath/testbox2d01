@@ -33,11 +33,12 @@
     <sourceAttachmentPath/>
   </compiler>
   <applications>
+    <application path="Main05.as"/>
     <application path="Main01.as"/>
     <application path="Main0601.as"/>
     <application path="Main06.as"/>
-    <application path="Main02.as"/>
     <application path="Main.as"/>
+    <application path="Main02.as"/>
   </applications>
   <modules/>
   <buildCSSFiles/>

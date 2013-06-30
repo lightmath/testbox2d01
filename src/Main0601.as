@@ -113,9 +113,9 @@ package
 			polygonShape.SetAsBox(40/worldScale,20/worldScale);
 			var fixtureDef:b2FixtureDef=new b2FixtureDef();
 			fixtureDef.shape=polygonShape;
-			fixtureDef.density=20;
+			fixtureDef.density=10;
 			fixtureDef.restitution=0.5;
-			fixtureDef.friction=0.6;
+			fixtureDef.friction=0.5;
 			var body:b2Body=world.CreateBody(bodyDef);
 			body.CreateFixture(fixtureDef);
 			if (! motor) {
