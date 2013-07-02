@@ -9,8 +9,8 @@ package
 	
 	public class customContact extends b2ContactListener
 	{
-		private const KILLBRICK:Number=5;
-		private const KILLPIG:Number=1;
+		private const KILLBRICK:Number=20;
+		private const KILLPIG:Number=5;
 		
 		override public function BeginContact(contact:b2Contact):void
 		{
@@ -38,27 +38,27 @@ package
 		
 		override public function PreSolve(contact:b2Contact,
 										  oldManifold:b2Manifold):void {
-			if (contact.GetManifold().m_pointCount>0) {
-				trace("a collision has been pre solved");
-				var fixtureA:b2Fixture=contact.GetFixtureA();
-				var fixtureB:b2Fixture=contact.GetFixtureB();
-				var bodyA:b2Body=fixtureA.GetBody();
-				var bodyB:b2Body=fixtureB.GetBody();
-				trace("first body: "+bodyA.GetUserData());
-				trace("second body: "+bodyB.GetUserData());
-				trace("---------------------------");
-			}
+//			if (contact.GetManifold().m_pointCount>0) {
+//				trace("a collision has been pre solved");
+//				var fixtureA:b2Fixture=contact.GetFixtureA();
+//				var fixtureB:b2Fixture=contact.GetFixtureB();
+//				var bodyA:b2Body=fixtureA.GetBody();
+//				var bodyB:b2Body=fixtureB.GetBody();
+//				trace("first body: "+bodyA.GetUserData());
+//				trace("second body: "+bodyB.GetUserData());
+//				trace("---------------------------");
+//			}
 			
-//			var fixtureA:b2Fixture=contact.GetFixtureA();
-//			var fixtureB:b2Fixture=contact.GetFixtureB();
-//			var dataA:String=fixtureA.GetBody().GetUserData();
-//			var dataB:String=fixtureB.GetBody().GetUserData();
-//			if (dataA=="cart" && dataB=="projectile") {
-//				contact.SetEnabled(false);
-//			}
-//			if (dataB=="cart" && dataA=="projectile") {
-//				contact.SetEnabled(false);
-//			}
+			var fixtureA:b2Fixture=contact.GetFixtureA();
+			var fixtureB:b2Fixture=contact.GetFixtureB();
+			var dataA:String=fixtureA.GetBody().GetUserData();
+			var dataB:String=fixtureB.GetBody().GetUserData();
+			if (dataA=="cart" && dataB=="projectile") {
+				contact.SetEnabled(false);
+			}
+			if (dataB=="cart" && dataA=="projectile") {
+				contact.SetEnabled(false);
+			}
 		}
 		
 		override public function PostSolve(contact:b2Contact,impulse:b2ContactImpulse):void 
@@ -68,6 +68,9 @@ package
 			var dataA:String=fixtureA.GetBody().GetUserData();
 			var dataB:String=fixtureB.GetBody().GetUserData();
 			var force:Number=impulse.normalImpulses[0];
+			trace("dataA="+dataA);
+			trace("dataB="+dataB);
+			trace("force="+force);
 			switch (dataA) {
 				case "pig" :
 					if (force>KILLPIG) {

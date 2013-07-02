@@ -27,6 +27,7 @@ package
 			world=new b2World(new b2Vec2(0,9.81),true);
 			debugDraw();
 			var bodyDef:b2BodyDef=new b2BodyDef();
+			
 			bodyDef.position.Set(320/worldScale,470/worldScale);
 			var polygonShape:b2PolygonShape=new b2PolygonShape();
 			polygonShape.SetAsBox(320/worldScale,10/worldScale);
@@ -34,6 +35,7 @@ package
 			fixtureDef.shape=polygonShape;
 			var groundBody:b2Body=world.CreateBody(bodyDef);
 			groundBody.CreateFixture(fixtureDef);
+			
 			bodyDef.position.Set(320/worldScale,430/worldScale);
 			bodyDef.type=b2Body.b2_dynamicBody;
 			polygonShape.SetAsBox(30/worldScale,30/worldScale);
@@ -42,6 +44,7 @@ package
 			fixtureDef.restitution=0.2;
 			var box2:b2Body=world.CreateBody(bodyDef);
 			box2.CreateFixture(fixtureDef);
+			
 			bodyDef.position.Set(420/worldScale,430/worldScale);
 			var box3:b2Body=world.CreateBody(bodyDef);
 			box3.CreateFixture(fixtureDef);
@@ -50,9 +53,10 @@ package
 			dJoint.bodyB=box3;
 			dJoint.localAnchorA=new b2Vec2(0,0);
 			dJoint.localAnchorB=new b2Vec2(0,0);
-			dJoint.length=100/worldScale;
+			dJoint.length=90/worldScale;
 			var distanceJoint:b2DistanceJoint;
 			distanceJoint=world.CreateJoint(dJoint) as b2DistanceJoint;
+			
 			bodyDef.position.Set(320/worldScale,240/worldScale);
 			var box4:b2Body=world.CreateBody(bodyDef);
 			box4.CreateFixture(fixtureDef);

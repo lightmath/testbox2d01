@@ -237,6 +237,7 @@ package
 			world.ClearForces();
 			for(var b:b2Body=world.GetBodyList();b;b=b.GetNext())
 			{
+				trace(">>>"+b.GetUserData()+"<<<");
 				if(b.GetUserData()=="remove")
 				{
 					world.DestroyBody(b);
