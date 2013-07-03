@@ -15,6 +15,7 @@ package
 	
 	import flash.display.Sprite;
 	import flash.events.Event;
+	import flash.events.KeyboardEvent;
 	
 	
 	/**
@@ -26,6 +27,12 @@ package
 	{
 		private var world:b2World;
 		private var worldScale:Number=30;
+		private var left:Boolean = false;
+		private var right:Boolean = false;
+		private var down:Boolean = false;
+		private var frj:b2RevoluteJoint;
+		private var rrj:b2RevoluteJoint;
+		private var motorSpeed:Number = 0;
 		
 		public function Main0602()
 		{
@@ -43,6 +50,36 @@ package
 			dJoint.length=100/worldScale;
 			var distanceJoint:b2DistanceJoint = world.CreateJoint(dJoint) as b2DistanceJoint;
 			addEventListener(Event.ENTER_FRAME,updateWorld);
+			stage.addEventListener(KeyboardEvent.KEY_DOWN,keyPressed);
+			stage.addEventListener(KeyboardEvent.KEY_UP,keyReleased);
+		}
+		
+		private function keyPressed(e:KeyboardEvent):void {
+			switch (e.keyCode) {
+				case 37 :
+					left=true;
+					break;
+				case 39 :
+					right = true;
+					break;
+				case 38 :
+					down=true;
+					break;
+			}
+		}
+		
+		private function keyReleased(e:KeyboardEvent):void {
+			switch (e.keyCode) {
+				case 37 :
+					left=false;
+					break;
+				case 39 :
+					right=false;
+					break;
+				case 38 :
+					down=false;
+					break;
+			}
 		}
 		
 		private function addCart(pX:Number,pY:Number,motor:Boolean):b2Body {
@@ -65,15 +102,28 @@ package
 			rJoint.bodyB=frontWheel;
 			rJoint.localAnchorA.Set(20/worldScale,15/worldScale);
 			rJoint.localAnchorB.Set(0,0);
+			var rj:b2RevoluteJoint;
 			if (motor) {
 				rJoint.enableMotor=true;
 				rJoint.maxMotorTorque=1000;
-				rJoint.motorSpeed=5;
+				rJoint.motorSpeed=0;
+				frj = world.CreateJoint(rJoint) as b2RevoluteJoint;
 			}
-			var revoluteJoint:b2RevoluteJoint = world.CreateJoint(rJoint) as b2RevoluteJoint;
+			else
+			{
+				rj = world.CreateJoint(rJoint) as b2RevoluteJoint;
+			}
+			
 			rJoint.bodyB = rearWheel;
 			rJoint.localAnchorA.Set(-20/worldScale,15/worldScale);
-			revoluteJoint = world.CreateJoint(rJoint) as b2RevoluteJoint;
+			if(motor)
+			{
+				rrj = world.CreateJoint(rJoint) as b2RevoluteJoint;
+			}
+			else
+			{
+				rj = world.CreateJoint(rJoint) as b2RevoluteJoint;
+			}
 			return body;
 		}
 		
@@ -104,6 +154,25 @@ package
 		}
 		
 		private function updateWorld(e:Event):void {
+			if (left) {
+				motorSpeed-=0.1;
+			}
+			if (right) {
+				motorSpeed+=0.1;
+			}
+			if(down)
+			{
+				motorSpeed=0;
+			}
+			motorSpeed*0.99;
+			if (motorSpeed>10) {
+				motorSpeed=10;
+			}
+			if (motorSpeed<-10) {
+				motorSpeed=-10;
+			}
+			frj.SetMotorSpeed(motorSpeed);
+			rrj.SetMotorSpeed(motorSpeed);
 			world.Step(1/30,10,10);
 			world.ClearForces();
 			world.DrawDebugData();
